@@ -1,4 +1,8 @@
+using DTS.Models.Tasks.TaskType.MemeDownloader;
+using DTS.Models.Tasks.TaskType;
+using DTS.Models.Worker;
 using Worker;
+using Worker.BusinessServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<WorkerRegistrar>();
 builder.Services.AddSingleton<WorkerInfo>(provider => provider.GetRequiredService<WorkerRegistrar>().GetWorkerInfo());
+builder.Services.AddScoped<TaskBusinessService>();
+builder.Services.AddScoped<ITaskType, MemeDownloaderTask>();
 
 var app = builder.Build();
 
@@ -26,6 +32,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 var provider = builder.Services.BuildServiceProvider();
 
